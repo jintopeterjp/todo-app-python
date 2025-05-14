@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Todo App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .task-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .task-form input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .task-form button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .task-form button:hover {
+            background-color: #2980b9;
+        }
+        
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .task-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .task-info {
+            flex-grow: 1;
+        }
+        
+        .task-title {
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .completed .task-title {
+            text-decoration: line-through;
+            color: #95a5a6;
+        }
+        
+        .due-date {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .complete-btn, .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .complete-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .complete-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .completed .complete-btn {
+            background-color: #95a5a6;
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
+        .task-count {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Todo List</h1>
+    
+    <form method="post" action="{% url 'add_task' %}" class="task-form">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Add a new task..." required>
+        <input type="date" name="due_date">
+        <input type="time" name="due_time"> 
+        <button type="submit">Add Task</button>
+    </form>
+    
+    <ul class="task-list">
+        {% for task in tasks %}
+        <li class="task-item {% if task.completed %}completed{% endif %}">
+            <div class="task-info">
+                <p class="task-title">{{ task.title }}</p>
+                {% if task.due_date %}
+                <p class="due-date">Due: {{ task.due_date }}</p>
+                {% endif %}
+                {% if task.due_time %}
+                <p class="due-date">Time: {{ task.due_time }}</p>
+                {% endif %}
+            </div>
+            <div class="task-actions">
+                <a href="{% url 'complete_task' task.id %}" class="complete-btn">
+                    {% if task.completed %}✅ Done{% else %}❌ Complete{% endif %}
+                </a>
+                <a href="{% url 'delete_task' task.id %}" class="delete-btn">Delete</a>
+            </div>
+        </li>
+        {% empty %}
+        <div class="empty-state">
+            <p>No tasks yet. Add your first task above!</p>
+        </div>
+        {% endfor %}
+    </ul>
+    
+    <div class="task-count">
+        {{ tasks|length }} task{{ tasks|pluralize }} in total
+    </div>
+</body>
+</html>
